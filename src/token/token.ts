@@ -42,3 +42,16 @@ export const tt: InternalTokenTypes = {
   FUNCTION: "FUNCTION",
   LET: "LET",
 };
+
+// 关键字映射存储
+export const keywords = new Map<string, TokenType>();
+keywords.set("fn", tt.FUNCTION);
+keywords.set("let", tt.LET);
+
+// 确定字符串类型
+export function lookupIndent(ident: string): TokenType {
+  if (keywords.has(ident)) {
+    return keywords.get(ident);
+  }
+  return tt.IDENT;
+}
