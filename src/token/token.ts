@@ -27,7 +27,14 @@ export const tt: InternalTokenTypes = {
 
   // Operators
   ASSIGN: "=", // 赋值
-  PLUS: "+", // 赋值
+  PLUS: "+", // 加
+  MINUS: "-",
+  BANG: "!",
+  ASTERISK: "*",
+  SLASH: "/",
+
+  LT: "<",
+  GT: ">",
 
   // 分隔符
   COMMA: ",", // 逗号
@@ -41,12 +48,22 @@ export const tt: InternalTokenTypes = {
   // 关键字
   FUNCTION: "FUNCTION",
   LET: "LET",
+  TRUE: "TRUE",
+  FALSE: "FALSE",
+  IF: "IF",
+  ELSE: "ELSE",
+  RETURN: "RETURN"
 };
 
 // 关键字映射存储
 export const keywords = new Map<string, TokenType>();
 keywords.set("fn", tt.FUNCTION);
 keywords.set("let", tt.LET);
+keywords.set("true", tt.TRUE);
+keywords.set("false", tt.FALSE);
+keywords.set("if", tt.IF);
+keywords.set("else", tt.ELSE);
+keywords.set("return", tt.RETURN);
 
 // 确定字符串类型
 export function lookupIndent(ident: string): TokenType {

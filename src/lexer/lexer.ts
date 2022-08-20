@@ -53,8 +53,20 @@ export class Lexer {
       case "=":
         tok = new Token(tt.ASSIGN, this.ch);
         break;
+      case "!":
+        tok = new Token(tt.BANG, this.ch);
+        break;
       case "+":
         tok = new Token(tt.PLUS, this.ch);
+        break;
+      case "-":
+        tok = new Token(tt.MINUS, this.ch);
+        break;
+      case "*":
+        tok = new Token(tt.ASTERISK, this.ch);
+        break;
+      case "/":
+        tok = new Token(tt.SLASH, this.ch);
         break;
       case ",":
         tok = new Token(tt.COMMA, this.ch);
@@ -73,6 +85,12 @@ export class Lexer {
         break;
       case "}":
         tok = new Token(tt.RBRACE, this.ch);
+        break;
+      case "<":
+        tok = new Token(tt.LT, this.ch);
+        break;
+      case ">":
+        tok = new Token(tt.GT, this.ch);
         break;
       case 0:
         tok = new Token(tt.EOF, "");

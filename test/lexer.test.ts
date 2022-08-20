@@ -34,6 +34,15 @@ test("lexer", () => {
       x + y;
     };
     let result = add(five, ten);
+
+    !-/*5;
+    5 < 10 > 5;
+
+    if (5 < 10) {
+      return true;
+    } else {
+      return false;
+    }
   `;
   const expectedTokens: Token[] = [
     new Token(tt.LET, "let"),
@@ -73,6 +82,39 @@ test("lexer", () => {
     new Token(tt.IDENT, "ten"),
     new Token(tt.RPAREN, ")"),
     new Token(tt.SEMICOLON, ";"),
+
+    new Token(tt.BANG, "!"),
+    new Token(tt.MINUS, "-"),
+    new Token(tt.SLASH, "/"),
+    new Token(tt.ASTERISK, "*"),
+    new Token(tt.INT, "5"),
+    new Token(tt.SEMICOLON, ";"),
+
+    new Token(tt.INT, "5"),
+    new Token(tt.LT, "<"),
+    new Token(tt.INT, "10"),
+    new Token(tt.GT, ">"),
+    new Token(tt.INT, "5"),
+    new Token(tt.SEMICOLON, ";"),
+
+    new Token(tt.IF, "if"),
+    new Token(tt.LPAREN, "("),
+    new Token(tt.INT, "5"),
+    new Token(tt.LT, "<"),
+    new Token(tt.INT, "10"),
+    new Token(tt.RPAREN, ")"),
+    new Token(tt.LBRACE, "{"),
+    new Token(tt.RETURN, "return"),
+    new Token(tt.TRUE, "true"),
+    new Token(tt.SEMICOLON, ";"),
+    new Token(tt.RBRACE, "}"),
+    new Token(tt.ELSE, "else"),
+    new Token(tt.LBRACE, "{"),
+    new Token(tt.RETURN, "return"),
+    new Token(tt.FALSE, "false"),
+    new Token(tt.SEMICOLON, ";"),
+    new Token(tt.RBRACE, "}"),
+
     new Token(tt.EOF, ""),
   ];
   const l: Lexer = new Lexer(input);
@@ -80,7 +122,6 @@ test("lexer", () => {
 
   let index = 0;
   while (next.type !== tt.EOF) {
-    console.log(index);
     expect(next.type).toBe(expectedTokens[index].type);
     expect(next.literal).toBe(expectedTokens[index].literal);
     next = l.nextToken();
