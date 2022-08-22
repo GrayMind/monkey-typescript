@@ -36,6 +36,9 @@ export const tt: InternalTokenTypes = {
   LT: "<",
   GT: ">",
 
+  EQ: "==",
+  NOT_EQ: "==",
+
   // 分隔符
   COMMA: ",", // 逗号
   SEMICOLON: ";", // 分号

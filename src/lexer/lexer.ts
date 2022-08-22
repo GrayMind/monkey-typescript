@@ -42,6 +42,17 @@ export class Lexer {
   }
 
   /**
+   * 查看下一个字符
+   */
+  peekChar(): string | number {
+    if (this.readPosition >= this.input.length) {
+      return 0;
+    } else {
+      return this.input.charAt(this.readPosition);
+    }
+  }
+
+  /**
    * 获取下一个 token
    * @returns { Token } token
    */
@@ -51,10 +62,22 @@ export class Lexer {
     this.skipWhiteSpace();
     switch (this.ch) {
       case "=":
-        tok = new Token(tt.ASSIGN, this.ch);
+        if(this.peekChar() === "=") {
+          const ch = this.ch
+          this.readChar()
+          tok = new Token(tt.EQ, ch + this.ch)
+        } else {
+          tok = new Token(tt.ASSIGN, this.ch);
+        }
         break;
       case "!":
-        tok = new Token(tt.BANG, this.ch);
+        if(this.peekChar() === "=") {
+          const ch = this.ch
+          this.readChar()
+          tok = new Token(tt.NOT_EQ, ch + this.ch)
+        } else {
+          tok = new Token(tt.BANG, this.ch);
+        }
         break;
       case "+":
         tok = new Token(tt.PLUS, this.ch);

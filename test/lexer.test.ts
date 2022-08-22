@@ -43,6 +43,8 @@ test("lexer", () => {
     } else {
       return false;
     }
+    10 == 10;
+    10 != 9;
   `;
   const expectedTokens: Token[] = [
     new Token(tt.LET, "let"),
@@ -114,6 +116,15 @@ test("lexer", () => {
     new Token(tt.FALSE, "false"),
     new Token(tt.SEMICOLON, ";"),
     new Token(tt.RBRACE, "}"),
+
+    new Token(tt.INT, "10"),
+    new Token(tt.EQ, "=="),
+    new Token(tt.INT, "10"),
+    new Token(tt.SEMICOLON, ";"),
+    new Token(tt.INT, "10"),
+    new Token(tt.NOT_EQ, "!="),
+    new Token(tt.INT, "9"),
+    new Token(tt.SEMICOLON, ";"),
 
     new Token(tt.EOF, ""),
   ];
