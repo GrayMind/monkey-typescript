@@ -1,24 +1,67 @@
+import { Token } from "../token/token";
 
 export interface Node {
-  tokenLiteral(): string
+  tokenLiteral(): string;
 }
 
+// 语句
 export interface Statement extends Node {
-  statementNode(): void
+  statementNode(): void;
 }
 
+// 表达式
 export interface Expression extends Node {
-  expressionNode(): void
+  expressionNode(): void;
 }
 
+// 程序入口
 export class Program implements Node {
-  statements: Statement[]
+  statements: Statement[];
 
   tokenLiteral(): string {
     if (this.statements && this.statements.length > 0) {
-      return this.statements[0].tokenLiteral()
+      return this.statements[0].tokenLiteral();
     } else {
-      return ""
+      return "";
     }
+  }
+}
+
+// TODO: Identifier 为什么是一个表达式
+export class Identifier implements Expression {
+  token: Token;
+  value: string;
+
+  constructor(token: Token, value: string) {
+    this.token = token;
+    this.value = value;
+  }
+
+  expressionNode(): void {}
+
+  tokenLiteral(): string {
+    return this.token.literal;
+  }
+}
+
+/**
+ * let 表达式
+ * let <identifier> = <expression>;
+ */
+export class LetStatement implements Statement {
+  token: Token;
+  name: Identifier;
+  value: Expression;
+
+  // constructor(token: Token, name: Identifier, value: Expression) {
+  //   this.token = token;
+  //   this.name = name;
+  //   this.value = value;
+  // }
+
+  statementNode(): void {}
+
+  tokenLiteral(): string {
+    return this.token.literal;
   }
 }
