@@ -12,6 +12,13 @@ function testLetStatement(stmt: Statement, name: string) {
   return true;
 }
 
+function checkParserErrors(p: Parser) {
+  const errors = p.errors;
+  for (const e of errors) {
+    console.log(`parser error: ${e}`);
+  }
+}
+
 test("parser", () => {
   const input = `
   let x = 5;
@@ -23,6 +30,7 @@ test("parser", () => {
   const p: Parser = new Parser(l);
 
   const program = p.parseProgram();
+  checkParserErrors(p);
   expect(program).not.toBe(null);
   expect(program.statements.length).toBe(3);
 

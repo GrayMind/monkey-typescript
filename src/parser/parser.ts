@@ -4,6 +4,7 @@ import { Statement, Program, LetStatement, Identifier } from "../ast/ast";
 
 export class Parser {
   l: Lexer;
+  errors: string[];
 
   curToken: Token;
   peekToken: Token;
@@ -12,6 +13,7 @@ export class Parser {
 
   constructor(l: Lexer) {
     this.l = l;
+    this.errors = [];
 
     this.nextToken();
     this.nextToken();
@@ -20,6 +22,11 @@ export class Parser {
   nextToken(): void {
     this.curToken = this.peekToken;
     this.peekToken = this.l.nextToken();
+  }
+
+  peekError(t: TokenType): void {
+    const msg = `expected next token to be ${t}, got ${this.peekToken.type} instead`;
+    this.errors.push(msg);
   }
 
   parseProgram(): Program {
@@ -75,6 +82,7 @@ export class Parser {
       this.nextToken();
       return true;
     } else {
+      this.peekError(t);
       return false;
     }
   }
