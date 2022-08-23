@@ -1,6 +1,6 @@
 import { Lexer } from "../src/lexer/lexer";
 import { Parser } from "../src/parser/parser";
-import { LetStatement, Statement } from "../src/ast/ast";
+import { LetStatement, ReturnStatement, Statement } from "../src/ast/ast";
 
 function testLetStatement(stmt: Statement, name: string) {
   expect(stmt.tokenLiteral()).toBe("let");
@@ -19,7 +19,7 @@ function checkParserErrors(p: Parser) {
   }
 }
 
-test("parser", () => {
+test("parser-let-statement", () => {
   const input = `
   let x = 5;
   let y = 10;
@@ -31,6 +31,7 @@ test("parser", () => {
 
   const program = p.parseProgram();
   checkParserErrors(p);
+
   expect(program).not.toBe(null);
   expect(program.statements.length).toBe(3);
 
@@ -40,5 +41,27 @@ test("parser", () => {
     if (!testLetStatement(stmt, identifier)) {
       return;
     }
+  });
+});
+
+test("parser-return-statement", () => {
+  const input = `
+    return 5;
+    return 10;
+    return 993322;
+  `;
+
+  const l: Lexer = new Lexer(input);
+  const p: Parser = new Parser(l);
+
+  const program = p.parseProgram();
+  checkParserErrors(p);
+
+  expect(program).not.toBe(null);
+  expect(program.statements.length).toBe(3);
+
+  program.statements.forEach((stmt, index) => {
+    const returnStmt = stmt as ReturnStatement;
+    expect(returnStmt.tokenLiteral()).toBe("return");
   });
 });

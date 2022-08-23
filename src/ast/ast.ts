@@ -53,11 +53,20 @@ export class LetStatement implements Statement {
   name: Identifier;
   value: Expression;
 
-  // constructor(token: Token, name: Identifier, value: Expression) {
-  //   this.token = token;
-  //   this.name = name;
-  //   this.value = value;
-  // }
+  statementNode(): void {}
+
+  tokenLiteral(): string {
+    return this.token.literal;
+  }
+}
+
+/**
+ * return 表达式
+ * return <expression>;
+ */
+export class ReturnStatement implements Statement {
+  token: Token;
+  returnValue: Expression;
 
   statementNode(): void {}
 
