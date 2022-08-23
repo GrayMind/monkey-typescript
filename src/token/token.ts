@@ -71,6 +71,7 @@ keywords.set('return', tt.RETURN)
 // 确定字符串类型
 export function lookupIndent (ident: string): TokenType {
   if (keywords.has(ident)) {
+    // @ts-expect-error
     return keywords.get(ident)
   }
   return tt.IDENT
