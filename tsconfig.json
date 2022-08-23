@@ -8,7 +8,8 @@
     "target": "ES5",
     "baseUrl": "./",
     "outDir": "./dist",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "strictNullChecks": true
   },
   "include": [
     "src/**/*ts"
