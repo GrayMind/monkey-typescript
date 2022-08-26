@@ -2,6 +2,7 @@ import { Token } from '../token/token'
 
 export interface Node {
   tokenLiteral: () => string
+  toString: () => string
 }
 
 // 语句
@@ -25,6 +26,14 @@ export class Program implements Node {
       return ''
     }
   }
+
+  toString (): string {
+    let out = ''
+    this.statements.forEach(stmt => {
+      out += stmt.toString()
+    })
+    return out
+  }
 }
 
 // TODO: Identifier 为什么是一个表达式
@@ -42,10 +51,14 @@ export class Identifier implements Expression {
   tokenLiteral (): string {
     return this.token.literal
   }
+
+  toString (): string {
+    return this.value
+  }
 }
 
 /**
- * let 表达式
+ * let 语句
  * let <identifier> = <expression>;
  */
 export class LetStatement implements Statement {
@@ -58,10 +71,20 @@ export class LetStatement implements Statement {
   tokenLiteral (): string {
     return this.token.literal
   }
+
+  toString (): string {
+    let out = `${this.token.literal} ${this.name.toString()} = `
+    if (this.value !== undefined) {
+      out += this.value.toString()
+    }
+    out += ';'
+
+    return out
+  }
 }
 
 /**
- * return 表达式
+ * return 语句
  * return <expression>;
  */
 export class ReturnStatement implements Statement {
@@ -72,5 +95,38 @@ export class ReturnStatement implements Statement {
 
   tokenLiteral (): string {
     return this.token.literal
+  }
+
+  toString (): string {
+    let out = `${this.token.literal} `
+
+    if (this.returnValue !== undefined) {
+      out += this.returnValue.toString()
+    }
+    out += ';'
+
+    return out
+  }
+}
+
+/**
+ * 表达式语句
+ */
+export class ExpressionStatement implements Statement {
+  token: Token
+  expression: Expression
+
+  statementNode (): void {}
+
+  tokenLiteral (): string {
+    return this.token.literal
+  }
+
+  toString (): string {
+    if (this.expression !== undefined) {
+      return this.expression.toString()
+    }
+
+    return ''
   }
 }
