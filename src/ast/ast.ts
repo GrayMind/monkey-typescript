@@ -77,6 +77,23 @@ export class IntegerLiteral implements Expression {
   }
 }
 
+// 前缀表示式
+export class PrefixExpression implements Expression {
+  token: Token
+  operator: string
+  right: Expression
+
+  expressionNode (): void {}
+
+  tokenLiteral (): string {
+    return this.token.literal
+  }
+
+  toString (): string {
+    return `(${this.operator}${this.right.toString()})`
+  }
+}
+
 /**
  * let 语句
  * let <identifier> = <expression>;

@@ -8,7 +8,8 @@ import {
   ReturnStatement,
   Expression,
   ExpressionStatement,
-  IntegerLiteral
+  IntegerLiteral,
+  PrefixExpression
 } from '../ast/ast'
 
 // 优先级
@@ -51,6 +52,8 @@ export class Parser {
 
     this.registerPrefix(tt.IDENT, this.parseIdentifier)
     this.registerPrefix(tt.INT, this.parseIntegerLiteral)
+    this.registerPrefix(tt.BANG, this.parsePrefixExpression)
+    this.registerPrefix(tt.MINUS, this.parsePrefixExpression)
   }
 
   nextToken (): void {
@@ -132,6 +135,7 @@ export class Parser {
   parseExpression (precedence: Precedence): any {
     const prefix = this.prefixParseFns[this.curToken.type]
     if (!prefix) {
+      this.errors.push(`no prefix parse function for ${this.curToken.type} found`)
       return null
     }
     const leftExp = prefix.call(this)
@@ -152,6 +156,18 @@ export class Parser {
       token,
       parseInt(this.curToken.literal)
     )
+  }
+
+  parsePrefixExpression (): Expression {
+    const exp = new PrefixExpression()
+    exp.token = this.curToken
+    exp.operator = this.curToken.literal
+
+    this.nextToken()
+
+    exp.right = this.parseExpression(Precedence.PREFIX)
+
+    return exp
   }
 
   curTokenIs (t: TokenType): boolean {
