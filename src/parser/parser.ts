@@ -5,8 +5,31 @@ import {
   Program,
   LetStatement,
   Identifier,
-  ReturnStatement
+  ReturnStatement,
+  Expression,
+  ExpressionStatement
 } from '../ast/ast'
+
+// 优先级
+export enum Precedence {
+  LOWEST = 1,
+  EQUALS, // ==
+  LESSGREATER, // > or <
+  SUM, // +
+  PRODUCT, // *
+  PREFIX, // -x or !x
+  CALL // myFunction(x)
+}
+
+export type prefixParseFn = () => Expression
+export interface PrefixParseFns {
+  [name: string]: prefixParseFn
+}
+
+export type infixParseFn = (node: Expression) => Expression
+export interface InfixParseFns {
+  [name: string]: infixParseFn
+}
 
 export class Parser {
   l: Lexer
@@ -15,7 +38,8 @@ export class Parser {
   curToken: Token
   peekToken: Token
 
-  statements: Statement[]
+  prefixParseFns: PrefixParseFns
+  infixParseFns: InfixParseFns
 
   constructor (l: Lexer) {
     this.l = l
@@ -23,6 +47,8 @@ export class Parser {
 
     this.nextToken()
     this.nextToken()
+
+    this.registerPrefix(tt.IDENT, this.parseIdentifier)
   }
 
   nextToken (): void {
@@ -55,7 +81,7 @@ export class Parser {
       case tt.RETURN:
         return this.parseReturnStatement()
       default:
-        return null
+        return this.parseExpressionStatement()
     }
   }
 
@@ -89,6 +115,35 @@ export class Parser {
     return stmt
   }
 
+  parseExpressionStatement (): ExpressionStatement {
+    const stmt = new ExpressionStatement()
+    stmt.token = this.curToken
+    stmt.expression = this.parseExpression(Precedence.LOWEST)
+
+    if (this.peekTokenIs(tt.SEMICOLON)) {
+      this.nextToken()
+    }
+
+    return stmt
+  }
+
+  parseExpression (precedence: Precedence): any {
+    const prefix = this.prefixParseFns[this.curToken.type]
+    if (!prefix) {
+      return null
+    }
+    const leftExp = prefix.call(this)
+    return leftExp
+  }
+
+  parseIdentifier (): Expression {
+    const token = this.curToken
+    return new Identifier(
+      token,
+      token.literal
+    )
+  }
+
   curTokenIs (t: TokenType): boolean {
     return this.curToken.type === t
   }
@@ -105,6 +160,20 @@ export class Parser {
       this.peekError(t)
       return false
     }
+  }
+
+  registerPrefix (t: TokenType, fn: prefixParseFn): void {
+    if (!this.prefixParseFns) {
+      this.prefixParseFns = {}
+    }
+    this.prefixParseFns[t] = fn
+  }
+
+  registerInfix (t: TokenType, fn: infixParseFn): void {
+    if (!this.infixParseFns) {
+      this.infixParseFns = {}
+    }
+    this.infixParseFns[t] = fn
   }
 }
 

@@ -19,7 +19,6 @@ test('ast toString', () => {
 
   const program = new Program()
   program.statements = [letStmt]
-  console.log(program.toString())
 
   expect(program.toString()).toBe('let myVar = anotherVar;')
 })
