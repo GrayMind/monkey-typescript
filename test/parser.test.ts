@@ -1,6 +1,6 @@
 import { Lexer } from '../src/lexer/lexer'
 import { Parser } from '../src/parser/parser'
-import { ExpressionStatement, Identifier, LetStatement, ReturnStatement, Statement } from '../src/ast/ast'
+import { ExpressionStatement, Identifier, IntegerLiteral, LetStatement, ReturnStatement, Statement } from '../src/ast/ast'
 
 function testLetStatement (stmt: Statement, name: string): boolean {
   expect(stmt.tokenLiteral()).toBe('let')
@@ -77,4 +77,19 @@ test('parse-identifier-expression', () => {
   const ident = stmt.expression as Identifier
   expect(ident.value).toBe('foobar')
   expect(ident.tokenLiteral()).toBe('foobar')
+})
+
+test('parse-integer-literal', () => {
+  const input = '5'
+  const l = new Lexer(input)
+  const p = new Parser(l)
+  const program = p.parseProgram()
+  checkParserErrors(p)
+
+  expect(program.statements.length).toBe(1)
+  const stmt = program.statements[0] as ExpressionStatement
+  expect(stmt).not.toBe(null)
+  const ident = stmt.expression as IntegerLiteral
+  expect(ident.value).toBe(5)
+  expect(ident.tokenLiteral()).toBe('5')
 })

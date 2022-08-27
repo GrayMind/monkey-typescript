@@ -5,7 +5,7 @@ function isLetter (ch: string | number): boolean {
 }
 
 function isNumber (ch: string | number): boolean {
-  return ch >= '0' && ch <= '9'
+  return typeof ch === 'string' && ch >= '0' && ch <= '9'
 }
 
 function isWhiteSpace (ch: string | number): boolean {

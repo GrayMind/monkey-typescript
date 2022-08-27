@@ -7,7 +7,8 @@ import {
   Identifier,
   ReturnStatement,
   Expression,
-  ExpressionStatement
+  ExpressionStatement,
+  IntegerLiteral
 } from '../ast/ast'
 
 // 优先级
@@ -49,6 +50,7 @@ export class Parser {
     this.nextToken()
 
     this.registerPrefix(tt.IDENT, this.parseIdentifier)
+    this.registerPrefix(tt.INT, this.parseIntegerLiteral)
   }
 
   nextToken (): void {
@@ -141,6 +143,14 @@ export class Parser {
     return new Identifier(
       token,
       token.literal
+    )
+  }
+
+  parseIntegerLiteral (): Expression {
+    const token = this.curToken
+    return new IntegerLiteral(
+      token,
+      parseInt(this.curToken.literal)
     )
   }
 

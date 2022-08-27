@@ -1,6 +1,25 @@
 import { Lexer } from '../src/lexer/lexer'
 import { Token, tt } from '../src/token/token'
 
+test('lexer-int', () => {
+  const input = '5'
+  const expectedTokens: Token[] = [
+    new Token(tt.INT, '5'),
+    new Token(tt.EOF, '')
+  ]
+  const l: Lexer = new Lexer(input)
+  let next: Token = l.nextToken()
+
+  let index = 0
+  while (next.type !== tt.EOF) {
+    expect(next.type).toBe(expectedTokens[index].type)
+    expect(next.literal).toBe(expectedTokens[index].literal)
+    next = l.nextToken()
+    index++
+  }
+  expect(next.type).toBe(expectedTokens[index].type)
+})
+
 test('lexer-base', () => {
   const input = '+=(){},;'
   const expectedTokens: Token[] = [

@@ -57,6 +57,26 @@ export class Identifier implements Expression {
   }
 }
 
+export class IntegerLiteral implements Expression {
+  token: Token
+  value: number
+
+  constructor (token: Token, value: number) {
+    this.token = token
+    this.value = value
+  }
+
+  expressionNode (): void {}
+
+  tokenLiteral (): string {
+    return this.token.literal
+  }
+
+  toString (): string {
+    return this.token.literal
+  }
+}
+
 /**
  * let 语句
  * let <identifier> = <expression>;
