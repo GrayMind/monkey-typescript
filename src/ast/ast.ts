@@ -94,6 +94,24 @@ export class PrefixExpression implements Expression {
   }
 }
 
+// 中缀表达式
+export class InfixExpression implements Expression {
+  token: Token
+  operator: string
+  left: Expression
+  right: Expression
+
+  expressionNode (): void {}
+
+  tokenLiteral (): string {
+    return this.token.literal
+  }
+
+  toString (): string {
+    return `(${this.left.toString()} ${this.operator} ${this.right.toString()})`
+  }
+}
+
 /**
  * let 语句
  * let <identifier> = <expression>;

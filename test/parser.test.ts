@@ -1,6 +1,6 @@
 import { Lexer } from '../src/lexer/lexer'
 import { Parser } from '../src/parser/parser'
-import { ExpressionStatement, Identifier, IntegerLiteral, LetStatement, PrefixExpression, ReturnStatement, Statement } from '../src/ast/ast'
+import { ExpressionStatement, Identifier, InfixExpression, IntegerLiteral, LetStatement, PrefixExpression, ReturnStatement, Statement } from '../src/ast/ast'
 
 function testLetStatement (stmt: Statement, name: string): boolean {
   expect(stmt.tokenLiteral()).toBe('let')
@@ -117,5 +117,68 @@ test('parse-prefix-expression', () => {
     const rightExp = exp.right as IntegerLiteral
     expect(rightExp.value).toBe(item.value)
     expect(rightExp.tokenLiteral()).toBe(String(item.value))
+  })
+})
+
+test('parse-infix-expression', () => {
+  const testInputs = [
+    { input: '5 + 5;', operator: '+', leftValue: 5, rightValue: 5 },
+    { input: '5 - 5;', operator: '-', leftValue: 5, rightValue: 5 },
+    { input: '5 * 5;', operator: '*', leftValue: 5, rightValue: 5 },
+    { input: '5 / 5;', operator: '/', leftValue: 5, rightValue: 5 },
+    { input: '5 > 5;', operator: '>', leftValue: 5, rightValue: 5 },
+    { input: '5 < 5;', operator: '<', leftValue: 5, rightValue: 5 },
+    { input: '5 == 5;', operator: '==', leftValue: 5, rightValue: 5 },
+    { input: '5 != 5;', operator: '!=', leftValue: 5, rightValue: 5 }
+  ]
+
+  testInputs.forEach(item => {
+    const l = new Lexer(item.input)
+    const p = new Parser(l)
+    const program = p.parseProgram()
+    checkParserErrors(p)
+    expect(program.statements.length).toBe(1)
+
+    const stmt = program.statements[0] as ExpressionStatement
+    expect(stmt).not.toBe(null)
+
+    const exp = stmt.expression as InfixExpression
+    expect(exp.tokenLiteral()).toBe(item.operator)
+    expect(exp.operator).toBe(item.operator)
+
+    const leftExp = exp.right as IntegerLiteral
+    expect(leftExp.value).toBe(item.leftValue)
+    expect(leftExp.tokenLiteral()).toBe(String(item.leftValue))
+
+    const rightExp = exp.right as IntegerLiteral
+    expect(rightExp.value).toBe(item.rightValue)
+    expect(rightExp.tokenLiteral()).toBe(String(item.rightValue))
+  })
+})
+
+test('parse-operator-precedence', () => {
+  const testInputs = [
+    { input: '-a * b', expected: '((-a) * b)' },
+    { input: '!-a', expected: '(!(-a))' },
+    { input: 'a + b + c', expected: '((a + b) + c)' },
+    { input: 'a + b - c', expected: '((a + b) - c)' },
+    { input: 'a * b * c', expected: '((a * b) * c)' },
+    { input: 'a * b / c', expected: '((a * b) / c)' },
+    { input: 'a + b / c', expected: '(a + (b / c))' },
+    { input: 'a + b * c + d / e - f', expected: '(((a + (b * c)) + (d / e)) - f)' },
+    { input: '3 + 4; -5 * 5', expected: '(3 + 4)((-5) * 5)' },
+    { input: '5 > 4 == 3 < 4', expected: '((5 > 4) == (3 < 4))' },
+    { input: '5 < 4 != 3 > 4', expected: '((5 < 4) != (3 > 4))' },
+    { input: '3 + 4 * 5 == 3 * 1 + 4 * 5', expected: '((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))' },
+    { input: '3 + 4 * 5 != 3 * 1 + 4 * 5', expected: '((3 + (4 * 5)) != ((3 * 1) + (4 * 5)))' }
+  ]
+
+  testInputs.forEach(item => {
+    const l = new Lexer(item.input)
+    const p = new Parser(l)
+    const program = p.parseProgram()
+    checkParserErrors(p)
+
+    expect(program.toString()).toBe(item.expected)
   })
 })

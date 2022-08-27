@@ -9,7 +9,8 @@ import {
   Expression,
   ExpressionStatement,
   IntegerLiteral,
-  PrefixExpression
+  PrefixExpression,
+  InfixExpression
 } from '../ast/ast'
 
 // 优先级
@@ -21,6 +22,18 @@ export enum Precedence {
   PRODUCT, // *
   PREFIX, // -x or !x
   CALL // myFunction(x)
+}
+
+// 运算符优先级
+export const TokenPrecedence = {
+  [tt.EQ]: Precedence.EQUALS,
+  [tt.NOT_EQ]: Precedence.EQUALS,
+  [tt.LT]: Precedence.LESSGREATER,
+  [tt.GT]: Precedence.LESSGREATER,
+  [tt.PLUS]: Precedence.SUM,
+  [tt.MINUS]: Precedence.SUM,
+  [tt.SLASH]: Precedence.PRODUCT,
+  [tt.ASTERISK]: Precedence.PRODUCT
 }
 
 export type prefixParseFn = () => Expression
@@ -54,6 +67,15 @@ export class Parser {
     this.registerPrefix(tt.INT, this.parseIntegerLiteral)
     this.registerPrefix(tt.BANG, this.parsePrefixExpression)
     this.registerPrefix(tt.MINUS, this.parsePrefixExpression)
+
+    this.registerInfix(tt.EQ, this.parseInfixExpression)
+    this.registerInfix(tt.NOT_EQ, this.parseInfixExpression)
+    this.registerInfix(tt.LT, this.parseInfixExpression)
+    this.registerInfix(tt.GT, this.parseInfixExpression)
+    this.registerInfix(tt.PLUS, this.parseInfixExpression)
+    this.registerInfix(tt.MINUS, this.parseInfixExpression)
+    this.registerInfix(tt.SLASH, this.parseInfixExpression)
+    this.registerInfix(tt.ASTERISK, this.parseInfixExpression)
   }
 
   nextToken (): void {
@@ -138,7 +160,18 @@ export class Parser {
       this.errors.push(`no prefix parse function for ${this.curToken.type} found`)
       return null
     }
-    const leftExp = prefix.call(this)
+    let leftExp = prefix.call(this)
+
+    while (!this.peekTokenIs(tt.SEMICOLON) && precedence < this.peekPrecedence()) {
+      const infix = this.infixParseFns[this.peekToken.type]
+      if (!infix) {
+        return leftExp
+      }
+
+      this.nextToken()
+
+      leftExp = infix.call(this, leftExp)
+    }
     return leftExp
   }
 
@@ -170,6 +203,18 @@ export class Parser {
     return exp
   }
 
+  parseInfixExpression (left: Expression): Expression {
+    const exp = new InfixExpression()
+    exp.token = this.curToken
+    exp.operator = this.curToken.literal
+    exp.left = left
+
+    const precedence = this.curPrecedence()
+    this.nextToken()
+    exp.right = this.parseExpression(precedence)
+    return exp
+  }
+
   curTokenIs (t: TokenType): boolean {
     return this.curToken.type === t
   }
@@ -186,6 +231,20 @@ export class Parser {
       this.peekError(t)
       return false
     }
+  }
+
+  curPrecedence (): Precedence {
+    if (this.peekToken && TokenPrecedence[this.curToken.type]) {
+      return TokenPrecedence[this.curToken.type]
+    }
+    return Precedence.LOWEST
+  }
+
+  peekPrecedence (): Precedence {
+    if (this.peekToken && TokenPrecedence[this.peekToken.type]) {
+      return TokenPrecedence[this.peekToken.type]
+    }
+    return Precedence.LOWEST
   }
 
   registerPrefix (t: TokenType, fn: prefixParseFn): void {
